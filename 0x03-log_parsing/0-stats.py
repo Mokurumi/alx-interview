@@ -7,8 +7,8 @@ Log Parsing
 import sys
 
 
-status_codes = ['200', '301', '400', '401', '403', '404', '405', '500']
-status_dict = {code: 0 for code in status_codes}
+status_codes = {'200': 0, '301': 0, '400': 0, '401': 0,
+                '403': 0, '404': 0, '405': 0, '500': 0}
 file_size = 0
 counter = 0
 
@@ -16,23 +16,25 @@ try:
     for line in sys.stdin:
         counter += 1
         data = line.split()
-        if len(data) > 2:
-            if data[-2] in status_dict:
-                status_dict[data[-2]] += 1
+        try:
             file_size += int(data[-1])
+        except:
+            pass
+        try:
+            if data[-2] in status_codes:
+                status_codes[data[-2]] += 1
+        except:
+            pass
         if counter == 10:
-            print('File size: {}'.format(file_size))
-            for key, value in status_dict.items():
-                if value:
-                    print('{}: {}'.format(key, value))
+            print("File size: {}".format(file_size))
+            for key in sorted(status_codes.keys()):
+                if status_codes[key] != 0:
+                    print("{}: {}".format(key, status_codes[key]))
             counter = 0
 except KeyboardInterrupt:
-    print('File size: {}'.format(file_size))
-    for key, value in status_dict.items():
-        if value:
-            print('{}: {}'.format(key, value))
-    exit()
-print('File size: {}'.format(file_size))
-for key, value in status_dict.items():
-    if value:
-        print('{}: {}'.format(key, value))
+    pass
+finally:
+    print("File size: {}".format(file_size))
+    for key in sorted(status_codes.keys()):
+        if status_codes[key] != 0:
+            print("{}: {}".format(key, status_codes[key]))
